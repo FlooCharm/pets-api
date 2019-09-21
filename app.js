@@ -21,4 +21,13 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/dogs', dogsRouter);
 
+app.use((error, req, res, next) => {
+	if(error) {
+		res.status(500).json({
+			message: error.message,
+			type: error.name
+		})
+	}
+})
+
 module.exports = app;

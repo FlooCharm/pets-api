@@ -7,77 +7,74 @@ const Dog = require('../models/dog');
 
 // index GET /dogs
 // fetch all dogs
-router.get('/', function(req, res) {
+router.get('/', function(req, res, next) {
 	Dog.find({})
 		.then(result => {
 			if(result.length)
-				res.status(200).send(result);
+				res.status(200).json({
+					dogs: result
+				});
 			else
-				res.status(404).send('Who let the dogs out');
+				res.status(404).json({
+					message: 'Who let the dogs out'
+				});
 		})
-		.catch(e => {
-			res.status(500).send(e);
-		})
+		.catch(next)
 });
 
 // index GET /dogs/:id
 // fetch one dogs
-router.get('/:id', function(req, res) {
-	Dog.findById(req.params.id).exec(console.log('fetching dog... U・ᴥ・U'))
+router.get('/:id', function(req, res, next) {
+	Dog.findById(req.params.id)
 		.then(result => {
 			if(result)
-				res.status(200).send(result);
+				res.status(200).json({
+					dog: result
+				});
 			else
 				res.status(404).send('Dog not found');
 		})
-		.catch(e => {
-			res.status(500).send('Cant fetch dog');
-		})
+		.catch(next)
 });
 
 // create POST /dogs
 // create dogs
-router.post('/', function(req, res) {
+router.post('/', function(req, res, next) {
 	const body = req.body;
-	const newDog = new Dog({
-		_id: new mongoose.Types.ObjectId(),
-		...body
-	})
-
-	newDog.save()
+	Dog.create(body)
 		.then(result => {
 			if(result)
-				res.status(201).send(result);
+				res.status(201).json({
+					dog: result
+				});
 			else
 				res.status(404).send('Cant create dog');
 		})
-		.catch(e => {
-			res.status(500).send(e);
-		})
+		.catch(next)
 })
 
 //update PUT /dogs/:id
 // update one dog
-router.put('/:id', function(req, res) {
+router.put('/:id', function(req, res, next) {
 	let body = req.body;
-	Dog.findByIdAndUpdate(req.params.id, req.body, { new: true }).exec(console.log('updating dog... U・ᴥ・U'))
+	Dog.findByIdAndUpdate(req.params.id, req.body, { new: true })
 		.then(result => {
 			if(result)
-				res.status(201).send(result);
+				res.status(201).json({
+					dog: result
+				});
 			else
 				res.status(404).send('Cant update, dog is missing');
 		})
-		.catch(e => {
-			res.status(500).send('Cant update dog');
-		})
+		.catch(next)
 })
 
 // delete DELETE /dogs/:id
 // delete one dog
-router.delete('/:id', function(req, res) {
+router.delete('/:id', function(req, res, next) {
 	Dog.findByIdAndRemove(req.params.id)
 		.then(() => res.status(204).send() )
-		.catch(e => res.status(500).send(e) )
+		.catch(next)
 });
 
 module.exports = router;
